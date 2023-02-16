@@ -1,12 +1,12 @@
-FROM node:16-alpine AS BUILD_IMAGE
+FROM node:18-alpine AS BUILD_IMAGE
 
 WORKDIR /app
 
 RUN apk update && apk add git
 
-COPY ./package.json ./package-lock.json ./
+COPY ./package.json ./yarn.lock ./
 
-RUN npm install
+RUN yarn install
 
 COPY ./src ./src
 
