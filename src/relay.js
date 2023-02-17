@@ -1,4 +1,5 @@
 import {signId, calculateId, getPublicKey} from 'nostr'
+import {redis} from "./redis"
 import pkg from 'nostr-tools';
 
 export async function process_invoice_payment(privkey, invoice)
@@ -124,15 +125,15 @@ function relay_send(ev, url, opts) {
       console.log(e)
     }
   }
-  
+
   function get_zapreq(desc) {
     if (!desc)
       return null
-  
+
     if (desc.kind === 9734)
       return desc
-  
+
     // TODO: handle private zaps
-  
+
     return null
   }
