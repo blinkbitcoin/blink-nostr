@@ -5,8 +5,7 @@ import { process_invoice_payment } from "./relay.js"
 export const run_zapper = async () => {
     const privkey = process.env.NOSTR_PRIVATE_KEY
     if (!privkey) {
-      console.log("set NOSTR_PRIVATE_KEY")
-      return
+        throw new Error("set NOSTR_PRIVATE_KEY")
     }
   
     try {

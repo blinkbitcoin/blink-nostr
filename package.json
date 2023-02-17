@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "docker build -t nicolasburtey/galoy-nostr:0.0.1 .",
+    "push": "docker push nicolasburtey/galoy-nostr:0.0.1",
+    "build-and-push": "yarn run build && yarn run push"
   },
   "author": "",
   "license": "ISC",
