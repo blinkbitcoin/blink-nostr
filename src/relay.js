@@ -118,8 +118,13 @@ function relay_send(ev, url, opts) {
   async function send_note(urls, {privkey, pubkey}, ev)
   {
     try {
-      const tasks = urls.map(relay_send.bind(null, ev))
-      await Promise.all(tasks)
+      for (const url of urls) {
+        try {
+            await relay_send(ev, url)
+        } catch (err) {
+            console.log(err)
+        }
+      }
     } catch (e) {
       //log?
       console.log(e)
