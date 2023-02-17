@@ -20,7 +20,7 @@ export async function process_invoice_payment(privkey, invoice)
     return
   }
   if (!desc) {
-    console.log(`Could not parse metadata description as json for ${label}`)
+    console.log(`Could not parse metadata description as json for ${invoice.id}`)
     return
   }
   // Get the nostr note entry in the metadata
