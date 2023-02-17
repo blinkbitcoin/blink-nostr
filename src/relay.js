@@ -92,27 +92,32 @@ const {relayInit} = pkg
 function relay_send(ev, url, opts) {
     return new Promise(async (resolve, reject) => {
       const relay = relayInit(url)
-      await relay.connect()
-  
-      let pub = relay.publish(ev)
-  
-      pub.on('ok', () => {
-        console.log(`${relay.url} has accepted our event`)
-        resolve(true)
+      try {
+          await relay.connect()
+
+          let pub = relay.publish(ev)
+      
+          pub.on('ok', () => {
+            console.log(`${relay.url} has accepted our event`)
+            resolve(true)
+          })
+          pub.on('failed', reason => {
+            console.log(`failed to publish to ${relay.url}: ${reason}`)
+            resolve(true)
+          })
+          pub.on('seen', () => {
+            console.log(`we saw the event on ${relay.url}`)
+            resolve(true)
+          })
+
+          relay.on('connect', () => {
+            console.log(`connected to ${relay.url}`)
+          })
+      } catch (err) {
+        console.log(err)
+        reject(err)
+      }
       })
-      pub.on('failed', reason => {
-        console.log(`failed to publish to ${relay.url}: ${reason}`)
-        resolve(true)
-      })
-      pub.on('seen', () => {
-        console.log(`we saw the event on ${relay.url}`)
-        resolve(true)
-      })
-  
-      relay.on('connect', () => {
-        console.log(`connected to ${relay.url}`)
-      })
-    })
   }
   
   async function send_note(urls, {privkey, pubkey}, ev)
