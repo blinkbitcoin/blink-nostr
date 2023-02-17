@@ -1,5 +1,5 @@
 import {signId, calculateId, getPublicKey} from 'nostr'
-import {redis} from "./redis"
+import {redis} from "./redis.js"
 import pkg from 'nostr-tools';
 
 export async function process_invoice_payment(privkey, invoice)
