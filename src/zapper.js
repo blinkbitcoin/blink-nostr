@@ -1,4 +1,5 @@
 import { getWalletInfo, subscribeToInvoices } from "./lnd.js"
+import { redis } from "./redis.js"
 import { process_invoice_payment } from "./relay.js"
 
 export const run_zapper = async () => {
@@ -11,16 +12,25 @@ export const run_zapper = async () => {
     try {
         const walletInfo = await getWalletInfo()
         if (!walletInfo) {
-            console.log("Could not get wallet info")
-            return
+            throw new Error("Could not get wallet info", e)
         }    
+        console.log({ walletInfo }, "walletInfo")
     } catch (e) {
-        console.log("Could not get wallet info", e)
-        return
+        throw new Error("Could not get wallet info", e)
+    }
+
+    try {
+        const redisOk = await redis.ping()
+        if (!redisOk) {
+            throw new Error("Could not ping redis")
+        }
+    } catch (err) {
+        throw new Error("Could not ping redis")
     }
 
     const sub = subscribeToInvoices()
-  
+    console.log(`🚀 "galoy-nostr" trigger ready`)
+
     sub.on("invoice_updated", async (invoice) => {
       if (!invoice.is_confirmed) {
         return
