@@ -1,0 +1,20 @@
+#@data/values
+---
+git_uri: git@github.com:blinkbitcoin/blink-nostr.git
+git_branch: kn/fix_bump_shared_task
+github_private_key: ((github-blinkbitcoin.private_key))
+github_token: ((github-blinkbitcoin.api_token))
+
+docker_registry: us.gcr.io/galoy-org
+docker_registry_user: ((docker-creds.username))
+docker_registry_password: ((docker-creds.password))
+
+artifacts_bucket_name: ((staging-gcp-creds.bucket_name))
+staging_inception_creds: ((staging-gcp-creds.creds_json))
+
+git_version_branch: version
+gh_org: blinkbitcoin
+gh_repository: blink-nostr
+
+slack_channel: blinkbitcoin-nostr-github
+slack_webhook_url: ((addons-slack.api_url))
