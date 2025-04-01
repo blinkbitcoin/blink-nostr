@@ -13,7 +13,6 @@ directories:
     - shared/actions/*
     excludePaths:
     - shared/actions/rust-*
-    - shared/actions/docker-*
     - shared/actions/chart-*
     newRootPath: shared/actions
 
@@ -28,5 +27,4 @@ directories:
     excludePaths:
     - shared/ci/**/rust-*
     - shared/ci/**/chart-*
-    - shared/ci/**/docker-*
     newRootPath: shared/ci
