@@ -33,5 +33,11 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.3.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@scure/bip39": "1.1.1",
+      "@scure/bip32": "1.1.5"
+    }
   }
 }
