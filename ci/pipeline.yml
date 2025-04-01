@@ -1,25 +1,18 @@
 #@ load("@ytt:data", "data")
-
 #@ load("vendor/pipeline-fragments.lib.yml",
+#@   "private_docker_registry",
+#@   "release_task_image_config",
+#@   "build_edge_image",
+#@   "edge_image_resource",
+
 #@   "nodejs_check_code",
 #@   "nodejs_audit",
-#@   "build_edge_image",
+#@   "install_nodejs_deps",
 #@   "repo_resource",
 #@   "nodejs_deps_resource",
-#@   "install_nodejs_deps",
-#@   "open_charts_pr",
+#@   "pipeline_tasks_resource",
 #@   "deps_version_resource",
 #@   "bundled_deps_resource",
-#@   "gh_release_resource",
-#@   "charts_repo_bot_branch",
-#@   "version_resource",
-#@   "versioned_image_resource",
-#@   "charts_repo_resource",
-#@   "release_task_image_config",
-#@   "edge_image_resource",
-#@   "public_docker_registry",
-#@   "pipeline_tasks_resource",
-#@   "nodejs_task_image_config",
 #@   "slack_resource",
 #@   "gcr_resource_type",
 #@   "slack_resource_type")
@@ -28,6 +21,7 @@ jobs:
 - #@ nodejs_check_code()
 - #@ nodejs_audit()
 - #@ install_nodejs_deps(pckgMgr="pnpm")
+- #@ build_edge_image()
 
 resources:
 - #@ repo_resource()
@@ -36,6 +30,7 @@ resources:
 - #@ deps_version_resource()
 - #@ bundled_deps_resource()
 - #@ slack_resource()
+- #@ edge_image_resource()
 
 resource_types:
 - #@ gcr_resource_type()
