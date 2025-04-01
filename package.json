@@ -18,11 +18,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ioredis": "^5.3.1",
-    "ln-service": "^54.9.0",
-    "nostr": "^0.2.7",
-    "nostr-tools": "^1.4.1",
-    "websocket-polyfill": "^0.0.3"
+    "ioredis": "5.3.1",
+    "ln-service": "54.9.2",
+    "nostr": "0.2.7",
+    "nostr-tools": "1.4.2",
+    "websocket-polyfill": "0.0.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.1",
