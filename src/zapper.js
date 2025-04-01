@@ -11,7 +11,7 @@ export const run_zapper = async () => {
     try {
         const walletInfo = await getWalletInfo()
         if (!walletInfo) {
-            throw new Error("Could not get wallet info", e)
+            throw new Error("Could not get wallet info")
         }    
         console.log({ walletInfo }, "walletInfo")
     } catch (e) {
@@ -23,8 +23,8 @@ export const run_zapper = async () => {
         if (!redisOk) {
             throw new Error("Could not ping redis")
         }
-    } catch (err) {
-        throw new Error("Could not ping redis")
+    } catch (e) {
+        throw new Error("Could not ping redis", e)
     }
 
     const sub = subscribeToInvoices()

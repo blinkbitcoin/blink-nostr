@@ -1,0 +1,7 @@
+.pnpm-store
+dist/
+coverage/
+.vscode
+
+*.yml
+*.yaml
