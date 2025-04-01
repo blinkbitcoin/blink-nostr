@@ -5,9 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "docker build -t nicolasburtey/galoy-nostr:0.0.1 .",
-    "push": "docker push nicolasburtey/galoy-nostr:0.0.1",
-    "build-and-push": "yarn run build && yarn run push"
+    "orig:build": "docker build -t nicolasburtey/galoy-nostr:0.0.1 .",
+    "orig:push": "docker push nicolasburtey/galoy-nostr:0.0.1",
+    "orig:build-and-push": "yarn run build && yarn run push",
+    "build": "pnpm install && tsup",
+    "code:check": "pnpm tsc:check && pnpm eslint:check && pnpm prettier:check",
+    "eslint:check": "eslint .",
+    "eslint:fix": "eslint . --fix",
+    "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
