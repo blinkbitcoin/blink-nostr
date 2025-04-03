@@ -13,9 +13,12 @@ pushd charts-repo
 
 yq -i e ".${PREFIX:+$PREFIX.}image.digest = strenv(digest)" ./charts/${CHARTS_SUBDIR}/values.yaml
 
-sed -i "s|\(digest: \"${digest}\"\).*$|\1 # METADATA:: repository=https://github.com/GaloyMoney/${CHARTS_SUBDIR};commit_ref=${ref};app=${CHARTS_SUBDIR};|g" "./charts/${CHARTS_SUBDIR}/values.yaml"
-
-yq -i e '.appVersion = strenv(app_version)' ./charts/${CHARTS_SUBDIR}/Chart.yaml
+if [ -z "${PREFIX:-}" ]; then
+  # if prefix is not set, that metadata usually doesn't make sense. The CHARTS_SUBDIR might not be the repo at the same time
+  sed -i "s|\(digest: \"${digest}\"\).*$|\1 # METADATA:: repository=https://github.com/GaloyMoney/${CHARTS_SUBDIR};commit_ref=${ref};app=${CHARTS_SUBDIR};|g" "./charts/${CHARTS_SUBDIR}/values.yaml"
+  # So this is probably some subchart (e.g. galoy-nostr in galoy-pay) so bumping app_version doesn't make sense either
+  yq -i e '.appVersion = strenv(app_version)' ./charts/${CHARTS_SUBDIR}/Chart.yaml
+fi
 
 if [[ -z $(git config --global user.email) ]]; then
   git config --global user.email "202112752+blinkbitcoinbot@users.noreply.github.com"
