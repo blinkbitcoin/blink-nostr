@@ -9,28 +9,145 @@
 #@   "nodejs_audit",
 #@   "install_nodejs_deps",
 #@   "repo_resource",
+#@   "gh_release_resource",
 #@   "nodejs_deps_resource",
+#@   "charts_repo_bot_branch",
+#@   "version_resource",
+#@   "versioned_image_resource",
 #@   "pipeline_tasks_resource",
 #@   "deps_version_resource",
 #@   "bundled_deps_resource",
+#@   "nodejs_task_image_config",
 #@   "slack_resource",
 #@   "gcr_resource_type",
-#@   "slack_resource_type")
+#@   "slack_resource_type",
+#@   "charts_repo_resource")
+
+
+#@ def release():
+name: release
+serial: true
+plan:
+- in_parallel:
+  - get: repo
+    passed: [ build-edge-image, audit, check-code ]
+  - get: edge-image
+    passed: [ build-edge-image ]
+    params:
+      format: oci
+  - get: pipeline-tasks
+  - get: version
+- task: prep-release
+  config:
+    platform: linux
+    image_resource: #@ release_task_image_config()
+    inputs:
+    - name: repo
+    - name: pipeline-tasks
+    - name: edge-image
+    - name: version
+    outputs:
+    - name: version
+    - name: artifacts
+    run:
+      path: pipeline-tasks/ci/vendor/tasks/prep-release-src.sh
+- in_parallel:
+  - put: versioned-image
+    params:
+      image: edge-image/image.tar
+      additional_tags: artifacts/gh-release-tag
+  - put: gh-release
+    params:
+      name: artifacts/gh-release-name
+      tag: artifacts/gh-release-tag
+      body: artifacts/gh-release-notes.md
+  - put: version
+    params:
+      file: version/version
+#@ end
+
+#! This is copied from concourse-shared. Changes are marked. Maybe we can refactor it.
+#@ def open_charts_pr():
+name: bump-image-in-chart
+plan:
+  - in_parallel:
+      - get: edge-image
+        passed: [ release ]
+        params: { skip_download: true }
+      - get: repo
+        trigger: true
+        passed: [ release ]
+      - get: version
+        trigger: true
+        passed: [ release ]
+      - get: charts-repo
+        params: { skip_download: true }
+      - get: pipeline-tasks
+  - task: bump-image-digest-in-values
+    config:
+      platform: linux
+      image_resource: #@ nodejs_task_image_config()
+      inputs:
+        - name: repo
+        - name: edge-image
+        - name: pipeline-tasks
+        - name: charts-repo
+        - name: version
+      outputs:
+        - name: charts-repo
+      params:
+        BRANCH: #@ data.values.git_charts_branch
+        #! Change here:
+        CHARTS_SUBDIR: #@ data.values.git_charts_subdir if hasattr(data.values, "git_charts_subdir") and data.values.git_charts_subdir else data.values.gh_repository
+        PREFIX: #@ data.values.git_charts_values_prefix
+      run:
+        #! change here:
+        path: pipeline-tasks/ci/tasks/docker-bump-image-digest.sh
+  - put: charts-repo-bot-branch
+    params:
+      repository: charts-repo
+      force: true
+  - task: open-charts-pr
+    config:
+      platform: linux
+      image_resource: #@ nodejs_task_image_config()
+      inputs:
+        - name: repo
+        - name: pipeline-tasks
+        - name: edge-image
+        - name: charts-repo
+      params:
+        GH_TOKEN: #@ data.values.github_token
+        BRANCH: #@ data.values.git_charts_branch
+        BOT_BRANCH: #@ data.values.git_charts_bot_branch
+        #! change here
+        CHARTS_SUBDIR: #@ data.values.git_charts_subdir if hasattr(data.values, "git_charts_subdir") and data.values.git_charts_subdir else data.values.gh_repository
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/chart-open-charts-pr.sh
+#@ end
+
 
 jobs:
 - #@ nodejs_check_code()
 - #@ nodejs_audit()
 - #@ install_nodejs_deps(pckgMgr="pnpm")
 - #@ build_edge_image()
+- #@ release()
+- #@ open_charts_pr()
 
 resources:
 - #@ repo_resource()
 - #@ nodejs_deps_resource(pckgMgr="pnpm")
+- #@ version_resource()
+- #@ versioned_image_resource()
 - #@ pipeline_tasks_resource()
 - #@ deps_version_resource()
 - #@ bundled_deps_resource()
 - #@ slack_resource()
 - #@ edge_image_resource()
+- #@ charts_repo_resource()
+- #@ charts_repo_bot_branch()
+- #@ gh_release_resource()
 
 resource_types:
 - #@ gcr_resource_type()
