@@ -123,7 +123,7 @@ plan:
         #! change here
         CHARTS_SUBDIR: #@ data.values.git_charts_subdir if hasattr(data.values, "git_charts_subdir") and data.values.git_charts_subdir else data.values.gh_repository
       run:
-        path: pipeline-tasks/ci/vendor/tasks/chart-open-charts-pr.sh
+        path: pipeline-tasks/ci/tasks/chart-open-charts-pr.sh
 #@ end
 
 
