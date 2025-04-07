@@ -28,6 +28,10 @@ Code diff contained in this image:
 
 https://github.com/blinkbitcoin/blink-nostr/compare/${old_ref}...${ref}
 
+Explanation for the name difference:
+The galoy-nostr project has been created within a hackathon and got never updated. Because it's used by blink
+exclusively, we decided to rename it to blink-nostr. However, the charts are not updated to reflext that.
+
 EOF
 
 gh pr close ${BOT_BRANCH} || true
