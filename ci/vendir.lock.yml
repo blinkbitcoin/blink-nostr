@@ -1,0 +1,15 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'chore: upgrade npm via recent docker-repo and more verbosity (#8)...'
+      sha: 8e74bb7383fb55fbf8ba6ab98780310b2b07d6d2
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'chore: upgrade npm via recent docker-repo and more verbosity (#8)...'
+      sha: 8e74bb7383fb55fbf8ba6ab98780310b2b07d6d2
+    path: .
+  path: vendor
+kind: LockConfig
