@@ -1,0 +1,15 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'fix: follow semantic versioning (#7)...'
+      sha: b247146a85b9c43a1dbce338885883f4774b7ca2
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'fix: follow semantic versioning (#7)...'
+      sha: b247146a85b9c43a1dbce338885883f4774b7ca2
+    path: .
+  path: vendor
+kind: LockConfig
