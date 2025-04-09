@@ -1,0 +1,15 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'chore: enable webhooks for pipeline-tasks git resource (#9)...'
+      sha: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'chore: enable webhooks for pipeline-tasks git resource (#9)...'
+      sha: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+    path: .
+  path: vendor
+kind: LockConfig

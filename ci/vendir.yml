@@ -1,0 +1,28 @@
+apiVersion: vendir.k14s.io/v1alpha1
+kind: Config
+
+# Relative to ci/
+directories:
+- path: ../.github/workflows/vendor
+  contents:
+  - path: . # Copy this folder out to ..
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared.git
+      ref: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+    includePaths:
+    - shared/actions/*
+    excludePaths:
+    - shared/actions/rust-*
+    newRootPath: shared/actions
+
+- path: ./vendor
+  contents:
+  - path: .
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared.git
+      ref: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+    includePaths:
+    - shared/ci/**/*
+    excludePaths:
+    - shared/ci/**/rust-*
+    newRootPath: shared/ci
