@@ -21,8 +21,8 @@
 #@   "slack_resource",
 #@   "gcr_resource_type",
 #@   "slack_resource_type",
+#@   "npm_resource_type",
 #@   "charts_repo_resource")
-
 
 #@ def release():
 name: release
@@ -136,11 +136,11 @@ jobs:
 - #@ open_charts_pr()
 
 resources:
-- #@ repo_resource()
+- #@ repo_resource(webhook=True)
 - #@ nodejs_deps_resource(pckgMgr="pnpm")
 - #@ version_resource()
 - #@ versioned_image_resource()
-- #@ pipeline_tasks_resource()
+- #@ pipeline_tasks_resource(webhook=True)
 - #@ deps_version_resource()
 - #@ bundled_deps_resource()
 - #@ slack_resource()
@@ -152,7 +152,5 @@ resources:
 resource_types:
 - #@ gcr_resource_type()
 - #@ slack_resource_type()
-- name: npm
-  type: docker-image
-  source:
-    repository: timotto/concourse-npm-resource
+- #@ npm_resource_type()
+
