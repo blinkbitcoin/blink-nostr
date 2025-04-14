@@ -1,0 +1,15 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'fix: bumping for forked repos (and typo) (#6)...'
+      sha: dafb65ba11f0b0594eafacad66828b3e76f0deb9
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'fix: bumping for forked repos (and typo) (#6)...'
+      sha: dafb65ba11f0b0594eafacad66828b3e76f0deb9
+    path: .
+  path: vendor
+kind: LockConfig

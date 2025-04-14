@@ -57,7 +57,7 @@ export async function process_invoice_payment(privkey, invoice)
   const relays = relays_tag.slice(1)
   const ptag = ptags[0]
   const etag = etags.length > 0 && etags[0]
-  const data = {ptag, zapreq, invoice, keypair, ptag, etag, desc}
+  const data = {ptag, zapreq, invoice, keypair, etag, desc}
   const zap_note = await make_zap_note(data)
   console.log(`Sending lightning zap note ${zap_note.id} to ${relays.join(", ")}`)
   await send_note(relays, keypair, zap_note)
@@ -89,7 +89,9 @@ async function make_zap_note({keypair, invoice, zapreq, ptag, etag, desc}) {
 
 
 const {relayInit} = pkg
-function relay_send(ev, url, opts) {
+function relay_send(ev, url) {
+    // not sure whether we can remove the async here. For now calming down eslint
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       const relay = relayInit(url)
       try {
@@ -120,7 +122,7 @@ function relay_send(ev, url, opts) {
       })
   }
   
-  async function send_note(urls, {privkey, pubkey}, ev)
+  async function send_note(urls, _ , ev)
   {
     try {
       for (const url of urls) {
