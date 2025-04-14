@@ -1,7 +1,7 @@
 #@data/values
 ---
 git_uri: git@github.com:blinkbitcoin/blink-nostr.git
-git_branch: kn/fix_bump_shared_task
+git_branch: main
 github_private_key: ((github-blinkbitcoin.private_key))
 github_token: ((github.api_token))
 
