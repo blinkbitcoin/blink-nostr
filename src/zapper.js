@@ -8,15 +8,11 @@ export const run_zapper = async () => {
         throw new Error("set NOSTR_PRIVATE_KEY")
     }
   
-    try {
-        const walletInfo = await getWalletInfo()
-        if (!walletInfo) {
-            throw new Error("Could not get wallet info")
-        }    
-        console.log({ walletInfo }, "walletInfo")
-    } catch (e) {
-        throw new Error("Could not get wallet info", e)
-    }
+    const walletInfo = await getWalletInfo()
+    if (!walletInfo) {
+      throw new Error("Could not get wallet info")
+    }    
+    console.log({ walletInfo }, "walletInfo")
 
     try {
         const redisOk = await redis.ping()
