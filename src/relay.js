@@ -95,6 +95,11 @@ function relay_send(ev, url) {
     return new Promise(async (resolve, reject) => {
       const relay = relayInit(url)
       try {
+          // Set up the connect handler before connecting
+          relay.on('connect', () => {
+            console.log(`connected to ${relay.url}`)
+          })
+
           await relay.connect()
 
           let pub = relay.publish(ev)
@@ -107,20 +112,22 @@ function relay_send(ev, url) {
             console.log(`failed to publish to ${relay.url}: ${reason}`)
             resolve(true)
           })
-          pub.on('seen', () => {
-            console.log(`we saw the event on ${relay.url}`)
-            resolve(true)
-          })
+          // commented as this is not a proper event and therefore results in: 
+          // TypeError: Cannot read properties of undefined (reading 'push')
+          // at Object.on (/app/node_modules/.pnpm/nostr-tools@1.4.2/node_modules/nostr-tools/lib/nostr.cjs.js:524:34)
+          // at file:///app/src/relay.js:110:15
+          // at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+          // pub.on('seen', () => {
+          //   console.log(`we saw the event on ${relay.url}`)
+          //   resolve(true)
+          // })
 
-          relay.on('connect', () => {
-            console.log(`connected to ${relay.url}`)
-          })
       } catch (err) {
         console.log(err)
         reject(err)
       }
-      })
-  }
+    })
+}
   
   async function send_note(urls, _ , ev)
   {
