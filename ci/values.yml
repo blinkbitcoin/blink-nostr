@@ -3,7 +3,7 @@
 git_uri: git@github.com:blinkbitcoin/blink-nostr.git
 git_branch: main
 github_private_key: ((github-blinkbitcoin.private_key))
-github_token: ((github.api_token))
+github_token: ((github-blinkbitcoin.api_token))
 
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
