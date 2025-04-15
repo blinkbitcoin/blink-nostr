@@ -117,7 +117,8 @@ plan:
         - name: edge-image
         - name: charts-repo
       params:
-        GH_TOKEN: #@ data.values.github_token
+        #! change here:
+        GH_TOKEN: #@ data.values.github_galoy_token
         BRANCH: #@ data.values.git_charts_branch
         BOT_BRANCH: #@ data.values.git_charts_bot_branch
         #! change here
