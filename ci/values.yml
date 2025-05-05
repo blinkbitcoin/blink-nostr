@@ -17,7 +17,7 @@ git_version_branch: version
 gh_org: blinkbitcoin
 gh_repository: blink-nostr
 
-git_charts_uri: git@github.com:GaloyMoney/charts.git
+git_charts_uri: git@github.com:blinkbitcoin/charts.git
 git_charts_branch: main
 git_charts_bot_branch: bot-bump-blink-nostr-image
 git_charts_subdir: galoy-pay
