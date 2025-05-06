@@ -109,3 +109,11 @@ pnpm prettier:fix
 5. It broadcasts the event to the relays specified in the zap request
 
 This enables Nostr clients to display zap receipts for payments made through the Blink Bitcoin Lightning Network node.
+
+## How to test in staging
+
+* grab a nostr account with a zappable note somewhere
+* configure the lightning address in that account (needs to be an address to a staging blink wallet which used signet )
+* grab the note from that account and zap it, you'll get a invoice
+* Pay the invoice with another wallet (NOT blink)
+* Check whether the zaps are shown in your nostr client
