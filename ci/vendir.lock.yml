@@ -2,14 +2,16 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'chore: enable webhooks for pipeline-tasks git resource (#9)...'
-      sha: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+      commitTitle: 'chore: correct references to blinkbitcoin and blinkbitcoinbot
+        (#10)'
+      sha: f7a2237275020bcbc6abd28c1bc5a21426ba25df
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'chore: enable webhooks for pipeline-tasks git resource (#9)...'
-      sha: 569a7824f10b6e0dccb68fb933d80ca7f121ef7a
+      commitTitle: 'chore: correct references to blinkbitcoin and blinkbitcoinbot
+        (#10)'
+      sha: f7a2237275020bcbc6abd28c1bc5a21426ba25df
     path: .
   path: vendor
 kind: LockConfig

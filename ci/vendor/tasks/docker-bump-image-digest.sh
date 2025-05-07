@@ -13,7 +13,7 @@ pushd charts-repo
 
 yq -i e '.image.digest = strenv(digest)' ./charts/${CHARTS_SUBDIR}/values.yaml
 
-sed -i "s|\(digest: \"${digest}\"\).*$|\1 # METADATA:: repository=https://github.com/GaloyMoney/${CHARTS_SUBDIR};commit_ref=${ref};app=${CHARTS_SUBDIR};|g" "./charts/${CHARTS_SUBDIR}/values.yaml"
+sed -i "s|\(digest: \"${digest}\"\).*$|\1 # METADATA:: repository=https://github.com/blinkbitcoin/${CHARTS_SUBDIR};commit_ref=${ref};app=${CHARTS_SUBDIR};|g" "./charts/${CHARTS_SUBDIR}/values.yaml"
 
 yq -i e '.appVersion = strenv(app_version)' ./charts/${CHARTS_SUBDIR}/Chart.yaml
 
