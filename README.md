@@ -91,12 +91,10 @@ node src/index.js
 The service monitors MongoDB for intraledger payments. Ensure the following database index exists for optimal performance:
 
 ```javascript
-// Create compound index for efficient querying
+// Create timestamp index for efficient time-based querying
+// This works with existing indexes: { paid: 1, processingCompleted: 1 }
 db.walletinvoices.createIndex({
-  "paid": 1,
-  "processingCompleted": 1,
-  "timestamp": 1,
-  "paymentRequest": 1
+  "timestamp": 1
 })
 ```
 

@@ -54,7 +54,7 @@ export const WalletInvoice = mongoose.model('WalletInvoice', walletInvoiceSchema
 // Optimized function to find recently paid invoices
 export const findRecentlyPaidInvoices = async (lastCheckedTime) => {
   try {
-    // Use compound index: { paid: 1, processingCompleted: 1, timestamp: 1, paymentRequest: 1 }
+    // Uses existing index { paid: 1, processingCompleted: 1 } and new timestamp index { timestamp: 1 }
     const invoices = await WalletInvoice.find({
       paid: true,
       processingCompleted: true,
