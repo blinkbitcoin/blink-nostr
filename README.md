@@ -7,10 +7,11 @@ This service connects Lightning Network payments to the Nostr protocol, enabling
 Blink Nostr is a bridge service that:
 
 1. Connects to a Lightning Network node (LND)
-2. Listens for paid invoices
-3. Retrieves zap request metadata from Redis
-4. Creates and signs Nostr zap receipt events (kind 9735)
-5. Broadcasts these events to specified Nostr relays
+2. Listens for paid Lightning invoices via LND subscriptions
+3. Monitors MongoDB for intraledger payments via optimized polling
+4. Retrieves zap request metadata from Redis
+5. Creates and signs Nostr zap receipt events (kind 9735)
+6. Broadcasts these events to specified Nostr relays
 
 ## Components
 
@@ -60,6 +61,9 @@ REDIS_2_DNS=<redis_sentinel_2_host>
 REDIS_0_SENTINEL_PORT=26379
 REDIS_1_SENTINEL_PORT=26379
 REDIS_2_SENTINEL_PORT=26379
+
+# MongoDB (for intraledger payment monitoring)
+MONGODB_CON=<mongodb_connection_string>
 ```
 
 ## Installation
@@ -81,6 +85,15 @@ pnpm build
 ```bash
 node src/index.js
 ```
+
+## Database Setup
+
+The service monitors MongoDB for intraledger payments using existing database indexes. No additional indexes are required.
+
+The service uses:
+- Existing `{ paid: 1, processingCompleted: 1 }` index for efficient filtering
+- Time-windowed queries to limit dataset size and improve performance
+- Adaptive polling (2-30 seconds) with performance monitoring and circuit breakers
 
 ## Development
 
