@@ -86,13 +86,17 @@ export const startIntraledgerMonitor = async (privkey) => {
       if (recentInvoices.length > 0) {
         const latestTimestamp = Math.max(...recentInvoices.map(inv => inv.timestamp.getTime()))
         lastCheckedTime = new Date(latestTimestamp)
-        
+
         if (processedCount > 0) {
           console.log(`✅ Processed ${processedCount} intraledger payments`)
         }
       } else {
-        // If no new invoices, just update to current time
-        lastCheckedTime = new Date()
+        // If no new invoices, advance time by a smaller increment to avoid gaps
+        const now = new Date()
+        const timeDiff = now.getTime() - lastCheckedTime.getTime()
+        const maxIncrement = 1000 * 60 * 30 // 30 minutes max increment
+        const increment = Math.min(timeDiff, maxIncrement)
+        lastCheckedTime = new Date(lastCheckedTime.getTime() + increment)
       }
       
       // Adaptive polling: faster when there's activity, slower when idle

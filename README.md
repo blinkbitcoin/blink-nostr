@@ -88,17 +88,12 @@ node src/index.js
 
 ## Database Setup
 
-The service monitors MongoDB for intraledger payments. Ensure the following database index exists for optimal performance:
+The service monitors MongoDB for intraledger payments using existing database indexes. No additional indexes are required.
 
-```javascript
-// Create timestamp index for efficient time-based querying
-// This works with existing indexes: { paid: 1, processingCompleted: 1 }
-db.walletinvoices.createIndex({
-  "timestamp": 1
-})
-```
-
-The service uses adaptive polling (2-30 seconds) and includes performance monitoring and circuit breakers.
+The service uses:
+- Existing `{ paid: 1, processingCompleted: 1 }` index for efficient filtering
+- Time-windowed queries to limit dataset size and improve performance
+- Adaptive polling (2-30 seconds) with performance monitoring and circuit breakers
 
 ## Development
 
