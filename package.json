@@ -9,6 +9,7 @@
     "orig:push": "docker push nicolasburtey/galoy-nostr:0.0.1",
     "orig:build-and-push": "yarn run build && yarn run push",
     "build": "pnpm install && tsup",
+    "test:bigquery": "node test-bigquery.js",
     "code:check": "pnpm eslint:check && pnpm prettier:check",
     "eslint:check": "eslint . --ext .js",
     "eslint:fix": "eslint .  --ext .js --fix",
@@ -18,9 +19,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/bigquery": "^7.0.0",
     "ioredis": "5.3.1",
     "ln-service": "57.24.0",
-    "mongoose": "^8.0.0",
     "nostr": "0.2.7",
     "nostr-tools": "1.4.2",
     "websocket-polyfill": "0.0.3"

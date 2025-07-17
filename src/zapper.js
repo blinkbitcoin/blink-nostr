@@ -1,7 +1,7 @@
 import { getWalletInfo, subscribeToInvoices } from "./lnd.js"
 import { redis } from "./redis.js"
 import { process_invoice_payment } from "./relay.js"
-import { connectToMongoDB } from "./mongodb.js"
+import { connectToBigQuery } from "./bigquery.js"
 import { startIntraledgerMonitor } from "./intraledger-monitor.js"
 
 export const run_zapper = async () => {
@@ -25,11 +25,11 @@ export const run_zapper = async () => {
         throw new Error("Could not ping redis", e)
     }
 
-    // Connect to MongoDB for intraledger payment monitoring
+    // Connect to BigQuery for intraledger payment monitoring
     try {
-        await connectToMongoDB()
+        await connectToBigQuery()
     } catch (e) {
-        throw new Error("Could not connect to MongoDB", e)
+        throw new Error("Could not connect to BigQuery", e)
     }
 
     // Start monitoring for Lightning Network payments via LND
@@ -50,6 +50,6 @@ export const run_zapper = async () => {
       }
     })
 
-    // Start monitoring for intraledger payments via optimized database polling
+    // Start monitoring for intraledger payments via BigQuery polling
     await startIntraledgerMonitor(privkey)
   }

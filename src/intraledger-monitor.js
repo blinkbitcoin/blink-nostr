@@ -1,4 +1,4 @@
-import { findRecentlyPaidInvoices, getLatestInvoiceTimestamp } from './mongodb.js'
+import { findRecentlyPaidInvoices, getLatestInvoiceTimestamp } from './bigquery.js'
 import { process_invoice_payment } from './relay.js'
 
 // Track the last time we checked for new payments
@@ -12,9 +12,9 @@ let queryCount = 0
 let totalQueryTime = 0
 
 export const startIntraledgerMonitor = async (privkey) => {
-  console.log('🔍 Starting optimized intraledger payment monitor')
-  
-  // Initialize lastCheckedTime from database
+  console.log('🔍 Starting BigQuery-based intraledger payment monitor')
+
+  // Initialize lastCheckedTime from BigQuery
   try {
     lastCheckedTime = await getLatestInvoiceTimestamp()
     console.log(`📅 Starting from timestamp: ${lastCheckedTime.toISOString()}`)
@@ -86,17 +86,13 @@ export const startIntraledgerMonitor = async (privkey) => {
       if (recentInvoices.length > 0) {
         const latestTimestamp = Math.max(...recentInvoices.map(inv => inv.timestamp.getTime()))
         lastCheckedTime = new Date(latestTimestamp)
-
+        
         if (processedCount > 0) {
           console.log(`✅ Processed ${processedCount} intraledger payments`)
         }
       } else {
-        // If no new invoices, advance time by a smaller increment to avoid gaps
-        const now = new Date()
-        const timeDiff = now.getTime() - lastCheckedTime.getTime()
-        const maxIncrement = 1000 * 60 * 30 // 30 minutes max increment
-        const increment = Math.min(timeDiff, maxIncrement)
-        lastCheckedTime = new Date(lastCheckedTime.getTime() + increment)
+        // If no new invoices, just update to current time
+        lastCheckedTime = new Date()
       }
       
       // Adaptive polling: faster when there's activity, slower when idle
