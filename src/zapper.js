@@ -26,8 +26,9 @@ export const run_zapper = async () => {
     }
 
     // Connect to BigQuery for intraledger payment monitoring
+    let bigquery
     try {
-        await connectToBigQuery()
+        bigquery = connectToBigQuery()
     } catch (e) {
         throw new Error("Could not connect to BigQuery", e)
     }
@@ -51,5 +52,5 @@ export const run_zapper = async () => {
     })
 
     // Start monitoring for intraledger payments via BigQuery polling
-    await startIntraledgerMonitor(privkey)
+    await startIntraledgerMonitor(privkey, bigquery)
   }

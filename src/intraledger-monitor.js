@@ -11,29 +11,29 @@ const processedPaymentHashes = new Set()
 let queryCount = 0
 let totalQueryTime = 0
 
-export const startIntraledgerMonitor = async (privkey) => {
+export const startIntraledgerMonitor = async (privkey, bigquery) => {
   console.log('🔍 Starting BigQuery-based intraledger payment monitor')
 
   // Initialize lastCheckedTime from BigQuery
   try {
-    lastCheckedTime = await getLatestInvoiceTimestamp()
+    lastCheckedTime = await getLatestInvoiceTimestamp(bigquery)
     console.log(`📅 Starting from timestamp: ${lastCheckedTime.toISOString()}`)
   } catch (error) {
     console.error('Error initializing timestamp:', error)
     lastCheckedTime = new Date(Date.now() - 300000) // 5 minutes ago
   }
-  
+
   // Adaptive polling interval
   let pollInterval = 5000 // Start with 5 seconds
   const minInterval = 2000 // Minimum 2 seconds
   const maxInterval = 30000 // Maximum 30 seconds
-  
+
   const poll = async () => {
     const queryStart = Date.now()
-    
+
     try {
-      const recentInvoices = await findRecentlyPaidInvoices(lastCheckedTime)
-      
+      const recentInvoices = await findRecentlyPaidInvoices(bigquery, lastCheckedTime)
+
       const queryDuration = Date.now() - queryStart
       queryCount++
       totalQueryTime += queryDuration
