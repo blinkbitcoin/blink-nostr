@@ -9,7 +9,7 @@
     "orig:push": "docker push nicolasburtey/galoy-nostr:0.0.1",
     "orig:build-and-push": "yarn run build && yarn run push",
     "build": "pnpm install && tsup",
-    "test:bigquery": "node test-bigquery.js",
+    "test": "vitest",
     "code:check": "pnpm eslint:check && pnpm prettier:check",
     "eslint:check": "eslint . --ext .js",
     "eslint:fix": "eslint .  --ext .js --fix",
@@ -34,7 +34,8 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "vitest": "^1.2.2"
   },
   "pnpm": {
     "overrides": {

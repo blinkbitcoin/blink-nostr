@@ -122,6 +122,16 @@ pnpm code:check
 pnpm prettier:fix
 ```
 
+## Testing
+
+Run the unit tests with:
+
+```bash
+pnpm test
+```
+
+This will execute the test suite using Vitest and display the results in the console.
+
 ## How It Works
 
 1. When a Lightning invoice is paid, the service receives a notification
