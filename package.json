@@ -40,7 +40,8 @@
   "pnpm": {
     "overrides": {
       "@scure/bip39": "1.1.1",
-      "@scure/bip32": "1.1.5"
+      "@scure/bip32": "1.1.5",
+      "form-data": "2.5.4"
     }
   }
 }
