@@ -46,7 +46,7 @@ export const startIntraledgerMonitor = async (privkey, bigquery) => {
       
       // Skip if query is too slow (circuit breaker)
       if (queryDuration > 5000) {
-        console.warn(`⚠️  Slow query detected (${queryDuration}ms), skipping processing`)
+        console.warn(`⚠️ Slow query detected (${queryDuration}ms), skipping processing`)
         return
       }
       

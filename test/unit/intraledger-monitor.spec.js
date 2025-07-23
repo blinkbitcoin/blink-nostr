@@ -225,7 +225,7 @@ describe('Intraledger Monitor', () => {
       await vi.runOnlyPendingTimersAsync();
 
       expect(console.warn).toHaveBeenCalledWith(
-        expect.stringMatching(/⚠️{2}Slow query detected.*skipping processing/)
+        expect.stringMatching(/⚠️\sSlow query detected.*skipping processing/)
       );
     });
 
