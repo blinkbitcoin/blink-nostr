@@ -94,6 +94,8 @@ node src/index.js
 
 The service monitors BigQuery for intraledger payments using the existing Kafka streaming pipeline. The `walletinvoices` collection is automatically streamed from MongoDB to BigQuery via Kafka.
 
+For detailed setup instructions, see [BIGQUERY_SETUP.md](BIGQUERY_SETUP.md).
+
 The service uses:
 - BigQuery's optimized columnar storage for efficient querying
 - Time-windowed queries to limit dataset size and improve performance

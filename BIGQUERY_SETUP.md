@@ -1,8 +1,8 @@
-# BigQuery Migration for Intraledger Zap Monitoring
+# BigQuery Setup for Intraledger Zap Monitoring
 
 ## Overview
 
-This document outlines the migration from MongoDB direct access to BigQuery for monitoring intraledger payments in the blink-nostr service. This change aligns with the existing Kafka streaming architecture and provides better separation of concerns.
+This document outlines the setup of BigQuery for monitoring intraledger payments in the blink-nostr service. This implementation uses the existing Kafka streaming architecture and provides better separation of concerns by avoiding direct database access.
 
 ## Why BigQuery?
 
@@ -12,22 +12,16 @@ This document outlines the migration from MongoDB direct access to BigQuery for 
 4. **Scalability**: No additional load on production databases
 5. **Data Freshness**: Kafka streaming provides near real-time data
 
-## Changes Made
+## Implementation
 
-### 1. Replaced MongoDB with BigQuery Client
+### 1. BigQuery Client Setup
 
-- **Removed**: `mongoose` dependency and `src/mongodb.js`
 - **Added**: `@google-cloud/bigquery` dependency and `src/bigquery.js`
-- **Updated**: Import statements in `src/zapper.js` and `src/intraledger-monitor.js`
+- **Implemented**: BigQuery queries in `src/queries.js`
+- **Integrated**: BigQuery monitoring in `src/zapper.js` and `src/intraledger-monitor.js`
 
 ### 2. Environment Variables
 
-**Old (MongoDB)**:
-```bash
-MONGODB_CON=<mongodb_connection_string>
-```
-
-**New (BigQuery)**:
 ```bash
 BIGQUERY_PROJECT_ID=galoy-reporting
 BIGQUERY_DATASET_ID=dataform_galoy_staging  # or dataform_galoy_bbw for production
@@ -169,16 +163,6 @@ After deployment, monitor the blink-nostr service logs for:
 2. **Data Latency**: Kafka streaming typically has <1 minute latency
 3. **Query Optimization**: Time-windowed queries limit data scanned
 4. **Cost Management**: BigQuery charges per query and data scanned
-
-## Rollback Plan
-
-If issues arise, you can quickly rollback by:
-
-1. Reverting to the MongoDB version of the code
-2. Updating environment variables back to `MONGODB_CON`
-3. Redeploying the previous version
-
-The MongoDB approach will continue to work as the database structure hasn't changed.
 
 ## Future Improvements
 
