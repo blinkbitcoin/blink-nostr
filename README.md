@@ -7,10 +7,11 @@ This service connects Lightning Network payments to the Nostr protocol, enabling
 Blink Nostr is a bridge service that:
 
 1. Connects to a Lightning Network node (LND)
-2. Listens for paid invoices
-3. Retrieves zap request metadata from Redis
-4. Creates and signs Nostr zap receipt events (kind 9735)
-5. Broadcasts these events to specified Nostr relays
+2. Listens for paid Lightning invoices via LND subscriptions
+3. Monitors BigQuery for intraledger payments via optimized polling
+4. Retrieves zap request metadata from Redis
+5. Creates and signs Nostr zap receipt events (kind 9735)
+6. Broadcasts these events to specified Nostr relays
 
 ## Components
 
@@ -60,6 +61,13 @@ REDIS_2_DNS=<redis_sentinel_2_host>
 REDIS_0_SENTINEL_PORT=26379
 REDIS_1_SENTINEL_PORT=26379
 REDIS_2_SENTINEL_PORT=26379
+
+# BigQuery (for intraledger payment monitoring)
+BIGQUERY_PROJECT_ID=galoy-reporting
+BIGQUERY_DATASET_ID=dataform_galoy_staging
+GOOGLE_APPLICATION_CREDENTIALS=<path_to_service_account_key>
+# OR use credentials directly
+BIGQUERY_CREDENTIALS=<service_account_json_string>
 ```
 
 ## Installation
@@ -82,6 +90,22 @@ pnpm build
 node src/index.js
 ```
 
+## BigQuery Setup
+
+The service monitors BigQuery for intraledger payments using the existing Kafka streaming pipeline. The `walletinvoices` collection is automatically streamed from MongoDB to BigQuery via Kafka.
+
+For detailed setup instructions, see [BIGQUERY_SETUP.md](BIGQUERY_SETUP.md).
+
+The service uses:
+- BigQuery's optimized columnar storage for efficient querying
+- Time-windowed queries to limit dataset size and improve performance
+- Adaptive polling (2-30 seconds) with performance monitoring and circuit breakers
+- Service account authentication for secure access to BigQuery
+
+No additional database setup is required as the data is automatically available through the existing streaming pipeline.
+
+The service uses adaptive polling (2-30 seconds) and includes performance monitoring and circuit breakers.
+
 ## Development
 
 This project uses:
@@ -99,6 +123,16 @@ pnpm code:check
 # Fix formatting issues
 pnpm prettier:fix
 ```
+
+## Testing
+
+Run the unit tests with:
+
+```bash
+pnpm test
+```
+
+This will execute the test suite using Vitest and display the results in the console.
 
 ## How It Works
 
