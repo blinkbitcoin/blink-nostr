@@ -8,11 +8,12 @@ directories:
   - path: . # Copy this folder out to ..
     git:
       url: https://github.com/blinkbitcoin/concourse-shared.git
-      ref: f7a2237275020bcbc6abd28c1bc5a21426ba25df
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
     includePaths:
     - shared/actions/*
     excludePaths:
     - shared/actions/rust-*
+    - shared/actions/tofu-*
     newRootPath: shared/actions
 
 - path: ./vendor
@@ -20,9 +21,26 @@ directories:
   - path: .
     git:
       url: https://github.com/blinkbitcoin/concourse-shared.git
-      ref: f7a2237275020bcbc6abd28c1bc5a21426ba25df
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
     includePaths:
     - shared/ci/**/*
     excludePaths:
     - shared/ci/**/rust-*
+    - shared/ci/**/tofu-*
     newRootPath: shared/ci
+
+- path: ../bin/vendor
+  contents:
+  - path: .
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
+    includePaths:
+    - shared/bin/**/*
+    excludePaths:
+    - shared/bin/**/rust-*
+    - shared/bin/**/tofu-*
+    newRootPath: shared/bin
+
+
+
