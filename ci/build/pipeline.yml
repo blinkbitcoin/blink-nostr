@@ -1,0 +1,421 @@
+jobs:
+- name: check-code
+  serial: true
+  plan:
+  - in_parallel:
+    - get: repo
+      trigger: true
+    - get: pipeline-tasks
+    - get: bundled-deps
+      trigger: true
+  - task: check-code
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: bundled-deps
+      - name: pipeline-tasks
+      - name: repo
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/nodejs-check-code.sh
+  on_failure:
+    put: slack
+    params:
+      channel: blinkbitcoin-nostr-github
+      username: concourse
+      icon_url: https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png
+      text: '<$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME| :face_with_symbols_on_mouth: $BUILD_JOB_NAME> failed!'
+- name: audit
+  serial: true
+  plan:
+  - in_parallel:
+    - get: repo
+      trigger: true
+    - get: pipeline-tasks
+  - task: audit
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: pipeline-tasks
+      - name: repo
+      params:
+        LEVEL: high
+        REPO_ROOT: repo
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/nodejs-audit.sh
+  on_failure:
+    put: slack
+    params:
+      channel: blinkbitcoin-nostr-github
+      username: concourse
+      icon_url: https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png
+      text: '<$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME| :face_with_symbols_on_mouth: $BUILD_JOB_NAME> failed!'
+- name: install-deps
+  plan:
+  - in_parallel:
+    - get: deps
+      trigger: true
+    - get: pipeline-tasks
+    - put: deps-version
+      params:
+        bump: patch
+  - task: install-deps
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: pipeline-tasks
+      - name: deps
+      - name: deps-version
+      outputs:
+      - name: bundled-deps
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/nodejs-cache-pnpm-deps.sh
+  - put: bundled-deps
+    params:
+      file: bundled-deps/bundled-deps-*.tgz
+  on_failure:
+    put: slack
+    params:
+      channel: blinkbitcoin-nostr-github
+      username: concourse
+      icon_url: https://cl.ly/2F421Y300u07/concourse-logo-blue-transparent.png
+      text: '<$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME| :face_with_symbols_on_mouth: $BUILD_JOB_NAME> failed!'
+- name: build-edge-image
+  serial: true
+  plan:
+  - in_parallel:
+    - get: repo
+      trigger: true
+    - get: pipeline-tasks
+  - task: prepare-docker-build
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: pipeline-tasks
+      - name: repo
+      outputs:
+      - name: repo
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/docker-prep-docker-build-env.sh
+  - task: build
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: gcr.io/kaniko-project/executor
+          tag: debug
+      inputs:
+      - name: repo
+      outputs:
+      - name: image
+      run:
+        path: /kaniko/executor
+        args:
+        - --dockerfile=Dockerfile
+        - --context=repo
+        - --use-new-run
+        - --single-snapshot
+        - --cache=false
+        - --no-push
+        - --tar-path=image/image.tar
+  - put: edge-image
+    params:
+      image: image/image.tar
+- name: release
+  serial: true
+  plan:
+  - in_parallel:
+    - get: repo
+      passed:
+      - build-edge-image
+      - audit
+      - check-code
+    - get: edge-image
+      passed:
+      - build-edge-image
+      params:
+        format: oci
+    - get: pipeline-tasks
+    - get: version
+  - task: prep-release
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/release-pipeline
+      inputs:
+      - name: repo
+      - name: pipeline-tasks
+      - name: edge-image
+      - name: version
+      outputs:
+      - name: version
+      - name: artifacts
+      run:
+        path: pipeline-tasks/ci/vendor/tasks/prep-release-src.sh
+  - in_parallel:
+    - put: versioned-image
+      params:
+        image: edge-image/image.tar
+        additional_tags: artifacts/gh-release-tag
+    - put: gh-release
+      params:
+        name: artifacts/gh-release-name
+        tag: artifacts/gh-release-tag
+        body: artifacts/gh-release-notes.md
+    - put: version
+      params:
+        file: version/version
+- name: bump-image-in-chart
+  plan:
+  - in_parallel:
+    - get: edge-image
+      passed:
+      - release
+      params:
+        skip_download: true
+    - get: repo
+      trigger: true
+      passed:
+      - release
+    - get: version
+      trigger: true
+      passed:
+      - release
+    - get: charts-repo
+      params:
+        skip_download: true
+    - get: pipeline-tasks
+  - task: bump-image-digest-in-values
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: repo
+      - name: edge-image
+      - name: pipeline-tasks
+      - name: charts-repo
+      - name: version
+      outputs:
+      - name: charts-repo
+      params:
+        BRANCH: main
+        CHARTS_SUBDIR: galoy-pay
+        PREFIX: galoy-nostr
+      run:
+        path: pipeline-tasks/ci/tasks/docker-bump-image-digest.sh
+  - put: charts-repo-bot-branch
+    params:
+      repository: charts-repo
+      force: true
+  - task: open-charts-pr
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          username: ((docker-creds.username))
+          password: ((docker-creds.password))
+          repository: us.gcr.io/galoy-org/nodejs-concourse
+      inputs:
+      - name: repo
+      - name: pipeline-tasks
+      - name: edge-image
+      - name: charts-repo
+      params:
+        GH_TOKEN: ((github-blinkbitcoin.api_token))
+        BRANCH: main
+        BOT_BRANCH: bot-bump-blink-nostr-image
+        CHARTS_SUBDIR: galoy-pay
+      run:
+        path: pipeline-tasks/ci/tasks/chart-open-charts-pr.sh
+resources:
+- name: repo
+  type: git
+  source:
+    ignore_paths:
+    - ci/*[^md]
+    fetch_tags: true
+    uri: git@github.com:blinkbitcoin/blink-nostr.git
+    branch: main
+    private_key: ((github-blinkbitcoin.private_key))
+  webhook_token: ((webhook.secret))
+- name: deps
+  type: git
+  source:
+    paths:
+    - pnpm-lock.yaml
+    uri: git@github.com:blinkbitcoin/blink-nostr.git
+    branch: main
+    private_key: ((github-blinkbitcoin.private_key))
+- name: version
+  type: semver
+  source:
+    initial_version: 0.0.0
+    driver: git
+    file: version
+    uri: git@github.com:blinkbitcoin/blink-nostr.git
+    branch: version
+    private_key: ((github-blinkbitcoin.private_key))
+- name: versioned-image
+  type: registry-image
+  source:
+    username: ((docker-creds.username))
+    password: ((docker-creds.password))
+    repository: us.gcr.io/galoy-org/blink-nostr
+- name: pipeline-tasks
+  type: git
+  source:
+    paths:
+    - ci/vendor/*
+    - ci/tasks/*
+    - ci/config/*
+    - Makefile
+    uri: git@github.com:blinkbitcoin/blink-nostr.git
+    branch: main
+    private_key: ((github-blinkbitcoin.private_key))
+  webhook_token: ((webhook.secret))
+- name: deps-version
+  type: semver
+  source:
+    initial_version: 0.1.0
+    driver: gcs
+    bucket: ((staging-gcp-creds.bucket_name))
+    json_key: ((staging-gcp-creds.creds_json))
+    key: blink-nostr-artifacts/versions/deps
+- name: bundled-deps
+  type: gcs-resource
+  source:
+    bucket: ((staging-gcp-creds.bucket_name))
+    json_key: ((staging-gcp-creds.creds_json))
+    regexp: blink-nostr-artifacts/deps/bundled-deps-v(.*)-.*.tgz
+- name: slack
+  type: slack-notification
+  source:
+    url: ((addons-slack.api_url))
+- name: edge-image
+  type: registry-image
+  source:
+    tag: edge
+    username: ((docker-creds.username))
+    password: ((docker-creds.password))
+    repository: us.gcr.io/galoy-org/blink-nostr
+- name: charts-repo
+  type: git
+  source:
+    uri: git@github.com:blinkbitcoin/charts.git
+    branch: main
+    private_key: ((github-blinkbitcoin.private_key))
+- name: charts-repo-bot-branch
+  type: git
+  source:
+    uri: git@github.com:blinkbitcoin/charts.git
+    branch: bot-bump-blink-nostr-image
+    private_key: ((github-blinkbitcoin.private_key))
+- name: gh-release
+  type: github-release
+  source:
+    owner: blinkbitcoin
+    repository: blink-nostr
+    access_token: ((github-blinkbitcoin.api_token))
+resource_types:
+- name: gcs-resource
+  type: docker-image
+  source:
+    repository: frodenas/gcs-resource
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+- name: npm
+  type: docker-image
+  source:
+    repository: k9ert/concourse-npm-resource
+---
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'chore: correct references to blinkbitcoin and blinkbitcoinbot (#10)'
+      sha: f7a2237275020bcbc6abd28c1bc5a21426ba25df
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'chore: correct references to blinkbitcoin and blinkbitcoinbot (#10)'
+      sha: f7a2237275020bcbc6abd28c1bc5a21426ba25df
+    path: .
+  path: vendor
+kind: LockConfig
+---
+apiVersion: vendir.k14s.io/v1alpha1
+kind: Config
+directories:
+- path: ../.github/workflows/vendor
+  contents:
+  - path: .
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared.git
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
+    includePaths:
+    - shared/actions/*
+    excludePaths:
+    - shared/actions/rust-*
+    - shared/actions/tofu-*
+    newRootPath: shared/actions
+- path: ./vendor
+  contents:
+  - path: .
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared.git
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
+    includePaths:
+    - shared/ci/**/*
+    excludePaths:
+    - shared/ci/**/rust-*
+    - shared/ci/**/tofu-*
+    newRootPath: shared/ci
+- path: ../bin/vendor
+  contents:
+  - path: .
+    git:
+      url: https://github.com/blinkbitcoin/concourse-shared
+      ref: 69c2178d534207d8141a4f29ddea80326e5220f1
+    includePaths:
+    - shared/bin/**/*
+    excludePaths:
+    - shared/bin/**/rust-*
+    - shared/bin/**/tofu-*
+    newRootPath: shared/bin
