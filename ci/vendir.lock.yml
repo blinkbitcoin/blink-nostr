@@ -9,9 +9,9 @@ directories:
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'chore: correct references to blinkbitcoin and blinkbitcoinbot
-        (#10)'
-      sha: f7a2237275020bcbc6abd28c1bc5a21426ba25df
+      commitTitle: 'fix(ci): preserve compatible chart pipeline and remove invalid
+        Git get parameter'
+      sha: f985c93d0f98d0c86f6f10fe67daa1854bcae90d
     path: .
   path: vendor
 kind: LockConfig
