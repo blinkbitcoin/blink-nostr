@@ -9,6 +9,7 @@ overrides:
   '@protobufjs/utf8': 1.1.2
   '@scure/bip39': 1.1.1
   '@scure/bip32': 1.1.5
+  bitcoinjs-lib: 6.1.8
   bn.js: 5.2.3
   form-data: 4.0.6
   protobufjs: 7.6.6
@@ -311,8 +312,8 @@ packages:
   bitcoin-ops@1.4.1:
     resolution: {integrity: sha512-pef6gxZFztEhaE9RY9HmWVmiIHqCb2OyS4HPKkpc6CIiiOa3Qmuoylxc5P2EkU3w+5eTSifI9SEZC88idAIGow==}
 
-  bitcoinjs-lib@6.1.7:
-    resolution: {integrity: sha512-tlf/r2DGMbF7ky1MgUqXHzypYHakkEnm0SZP23CJKIqNY/5uNAnMbFhMJdhjrL/7anfb/U8+AlpdjPWjPnAalg==}
+  bitcoinjs-lib@6.1.8:
+    resolution: {integrity: sha512-A6o+yq7BvwlmLj4F0NC5f3XX109rRe5evxi368S9zil5voOtUfiqfiMCzZYKHk4k7iIJ3+NmcQW05Ar4CBlKyg==}
     engines: {node: '>=8.0.0'}
 
   bn.js@5.2.3:
@@ -1594,7 +1595,7 @@ snapshots:
 
   bitcoin-ops@1.4.1: {}
 
-  bitcoinjs-lib@6.1.7:
+  bitcoinjs-lib@6.1.8:
     dependencies:
       '@noble/hashes': 1.2.0
       bech32: 2.0.0
@@ -2136,7 +2137,7 @@ snapshots:
   invoices@4.0.0:
     dependencies:
       bech32: 2.0.0
-      bitcoinjs-lib: 6.1.7
+      bitcoinjs-lib: 6.1.8
       bn.js: 5.2.3
       bolt07: 1.9.4
       bolt09: 2.1.0
@@ -2299,7 +2300,7 @@ snapshots:
       '@types/ws': 8.18.1
       async: 3.2.6
       asyncjs-util: 1.2.12
-      bitcoinjs-lib: 6.1.7
+      bitcoinjs-lib: 6.1.8
       bn.js: 5.2.3
       bolt07: 1.9.4
       bolt09: 2.2.0
@@ -2481,7 +2482,7 @@ snapshots:
     dependencies:
       bip66: 2.0.0
       bitcoin-ops: 1.4.1
-      bitcoinjs-lib: 6.1.7
+      bitcoinjs-lib: 6.1.8
       bn.js: 5.2.3
       pushdata-bitcoin: 1.0.1
       varuint-bitcoin: 1.1.2
